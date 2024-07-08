@@ -54,7 +54,7 @@ let $ = { // Convenience for internals.
 	//		Hello World!
 	//		<script>me().style.color = 'red'</script>
 	//	</div>
-	me(selector=null, start=document, warning=true) {
+	me(selector=null, start=document, warning=false) {
 		if (selector == null) return $.sugar(start.currentScript.parentElement) // Just local me() in <script>
 		if (selector instanceof Event) return selector.currentTarget ? $.me(selector.currentTarget) : (console.warn(`Surreal: Event currentTarget is null. Please save your element because async will lose it`), null) // Events try currentTarget
 		if (selector === '-' || selector === 'prev' || selector === 'previous') return $.sugar(start.currentScript.previousElementSibling) // Element directly before <script>
@@ -66,7 +66,7 @@ let $ = { // Convenience for internals.
 	// any() is me() but always returns array of elements. Requires selector.
 	// Returns an Array of elements (so you can use methods like forEach/filter/map/reduce if you want).
 	// Example: any('button')
-	any(selector, start=document, warning=true) {
+	any(selector, start=document, warning=false) {
 		if (selector == null) return $.sugar([start.currentScript.parentElement]) // Similar to me()
 		if (selector instanceof Event) return selector.currentTarget ? $.any(selector.currentTarget) : (console.warn(`Surreal: Event currentTarget is null. Please save your element because async will lose it`), null) // Events try currentTarget
 		if (selector === '-' || selector === 'prev' || selector === 'previous') return $.sugar([start.currentScript.previousElementSibling]) // Element directly before <script>
@@ -283,7 +283,19 @@ function pluginEffects(e) {
 
 // 🔌 Add plugins here!
 surreal.plugins.push(pluginEffects)
-console.log("Surreal: Added plugins.")
+surreal.plugins.push(element => {
+  element.text = function text(e, value) {
+    if(value === undefined) {
+      if(surreal.isNodeList(e)) return []
+      if(surreal.isNode(e)) return e.textContent
+      return null
+    }
+    if(surreal.isNodeList(e)) e.forEach(_ => { text(_, value) })
+    if(surreal.isNode(e)) e.textContent = value
+    return e
+  }
+})
+//console.log("Surreal: Added plugins.")
 
 // 🌐 Add global shortcuts here!
 // DOM.
@@ -313,4 +325,4 @@ const onloadAdd = addOnload = onload_add = add_onload = (f) => {
 	}
 	window.onload = f // window.onload was not set yet.
 }
-console.log("Surreal: Added shortcuts.")
+//console.log("Surreal: Added shortcuts.")
