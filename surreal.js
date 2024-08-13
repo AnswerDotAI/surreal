@@ -208,7 +208,6 @@ let $ = { // Convenience for internals.
 	},
 	// Puts Surreal functions except for "restricted" in global scope.
 	globalsAdd() {
-		console.log(`Surreal: Adding convenience globals to window.`)
 		let restricted = ['$', 'sugar']
 		for (const [key, value] of Object.entries(this)) {
 			if (!restricted.includes(key)) window[key] != 'undefined' ? window[key] = value : console.warn(`Surreal: "${key}()" already exists on window. Skipping to prevent overwrite.`)
@@ -235,7 +234,6 @@ let $ = { // Convenience for internals.
 }
 // Finish up...
 $.globalsAdd() // Full convenience.
-console.log("Surreal: Loaded.")
 return $
 })() // End of Surreal 👏
 
@@ -295,7 +293,6 @@ surreal.plugins.push(element => {
     return e
   }
 })
-//console.log("Surreal: Added plugins.")
 
 // 🌐 Add global shortcuts here!
 // DOM.
@@ -325,4 +322,3 @@ const onloadAdd = addOnload = onload_add = add_onload = (f) => {
 	}
 	window.onload = f // window.onload was not set yet.
 }
-//console.log("Surreal: Added shortcuts.")
