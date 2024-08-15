@@ -281,18 +281,22 @@ function pluginEffects(e) {
 
 // 🔌 Add plugins here!
 surreal.plugins.push(pluginEffects)
-surreal.plugins.push(element => {
-  element.text = function text(e, value) {
-    if(value === undefined) {
-      if(surreal.isNodeList(e)) return []
-      if(surreal.isNode(e)) return e.textContent
-      return null
+
+// 🔌 Plugin: Text
+function pluginText(e) {
+  function text(e, value) {
+    if (value === undefined) {
+      if (surreal.isNodeList(e)) return Array.from(e).map(node => node.textContent);
+      if (surreal.isNode(e)) return e.textContent;
+      return null;
     }
-    if(surreal.isNodeList(e)) e.forEach(_ => { text(_, value) })
-    if(surreal.isNode(e)) e.textContent = value
-    return e
+    if (surreal.isNodeList(e)) e.forEach(_ => { _.textContent = value; });
+    if (surreal.isNode(e)) e.textContent = value;
+    return e;
   }
-})
+  e.text = (value) => { return text(e, value); };
+}
+surreal.plugins.push(pluginText);
 
 // 🌐 Add global shortcuts here!
 // DOM.
